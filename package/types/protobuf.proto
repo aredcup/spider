@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package types;
+
+message ParserStatus {
+    enum Status {
+        NIL = 0;
+        READY = 1;
+        WORKING = 2;
+        DONE = 3;
+    }
+}
+
+message ParserType {
+    enum Type {
+        NIL = 0;
+    }
+}
+
+message ClientResultCode {
+    enum Code {
+        OK = 0;
+        READY = 1;
+        ERROR = 9;
+    }
+}
+
+message RequestType {
+    enum Type {
+        NIL = 0;
+        CLIENT_INIT = 1;
+        PARSER_URL = 10;
+    }
+}
+
+message ResponseType {
+    enum Type {
+        ParserResult = 0;
+        PostResult = 1;
+        ErrorResult = 9;
+    }
+}
+
+message MatchRule {
+    string rule = 1;
+    string keys = 2;
+    string values = 3;
+}
+
+
+message Request {
+    ParserStatus.Status status = 1;
+    ParserType.Type parser = 2;
+    RequestType.Type type = 3;
+    string host = 4;
+    string path = 5;
+    repeated MatchRule matchRules = 6;
+    string pathRule = 7;
+
+}
+
+
+message Response {
+    ResponseType.Type type =1;
+    repeated MatchRule MatchRules = 2;
+    bytes data = 3;
+}
+
+message ParseResult {
+    ClientResultCode.Code code = 1;
+    Request requested = 2;
+    repeated Request requests = 3;
+    Response response = 4;
+    string errorMessage = 5;
+}
+
+
+service Processor {
+    rpc Processor (stream ParseResult) returns (stream Request) {
+    }
+}
